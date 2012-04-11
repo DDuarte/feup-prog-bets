@@ -2,16 +2,14 @@
 #include "../utilities.h"
 #include "bets.h"
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <ctime>
 #include <utility>
 #include <iomanip>
-
 #include <direct.h>
 
-#include <time.h>
-#include <iostream>
 
 std::vector<int> InitVectorWithUserInput(int size, int min, int max, char* name)
 {

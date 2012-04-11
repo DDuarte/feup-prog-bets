@@ -52,65 +52,65 @@ Key GetPrizeKeyFromFile(int& totalBets)
 
 int GetPrizeForHit(int numbers, int stars)
 {
-	const int NO_PRIZE = -1;
+    const int NO_PRIZE = -1;
 
-	switch (stars)
-	{
-	case 0:
-		switch (numbers)
-		{
-		case 2: return 12;
-		case 3: return 9;
-		case 4: return 5;
-		case 5: return 2;
-		default: return NO_PRIZE;
-		}
-		break;
-	case 1:
-		switch (numbers)
-		{
-		case 2: return 11;
-		case 3: return 8;
-		case 4: return 4;
-		case 5: return 1;
-		default: return NO_PRIZE;
-		}
-		break;
-	case 2:
-		switch (numbers)
-		{
-		case 1: return 10;
-		case 2: return 7;
-		case 3: return 6;
-		case 4: return 3;
-		case 5: return 0;
-		default: return NO_PRIZE;
-		}
-		break;
-	default:
-		return NO_PRIZE;
-	}
+    switch (stars)
+    {
+    case 0:
+        switch (numbers)
+        {
+        case 2: return 12;
+        case 3: return 9;
+        case 4: return 5;
+        case 5: return 2;
+        default: return NO_PRIZE;
+        }
+        break;
+    case 1:
+        switch (numbers)
+        {
+        case 2: return 11;
+        case 3: return 8;
+        case 4: return 4;
+        case 5: return 1;
+        default: return NO_PRIZE;
+        }
+        break;
+    case 2:
+        switch (numbers)
+        {
+        case 1: return 10;
+        case 2: return 7;
+        case 3: return 6;
+        case 4: return 3;
+        case 5: return 0;
+        default: return NO_PRIZE;
+        }
+        break;
+    default:
+        return NO_PRIZE;
+    }
 }
 
 std::string GetHitForPrize(int prize)
 {
-	switch (prize)
-	{
-	case 1:  return "5+2"; break;
-	case 2:  return "5+1"; break;
-	case 3:  return "5+0"; break;
-	case 4:  return "4+2"; break;
-	case 5:  return "4+1"; break;
-	case 6:  return "4+0"; break;
-	case 7:  return "3+2"; break;
-	case 8:  return "2+2"; break;
-	case 9:  return "3+1"; break;
-	case 10: return "3+0"; break;
-	case 11: return "1+2"; break;
-	case 12: return "2+1"; break;
-	case 13: return "2+0"; break;
-	default: return "ERR";
-	}
+    switch (prize)
+    {
+    case 1:  return "5+2"; break;
+    case 2:  return "5+1"; break;
+    case 3:  return "5+0"; break;
+    case 4:  return "4+2"; break;
+    case 5:  return "4+1"; break;
+    case 6:  return "4+0"; break;
+    case 7:  return "3+2"; break;
+    case 8:  return "2+2"; break;
+    case 9:  return "3+1"; break;
+    case 10: return "3+0"; break;
+    case 11: return "1+2"; break;
+    case 12: return "2+1"; break;
+    case 13: return "2+0"; break;
+    default: return "ERR";
+    }
 }
 
 Key GetKey(std::string& key)
@@ -228,10 +228,10 @@ struct Match
 
 struct PrizeKeyRow
 {
-	int PrizeId;
-	std::string Hits;
-	int WinnerCount;
-	double Value;
+    int PrizeId;
+    std::string Hits;
+    int WinnerCount;
+    double Value;
 };
 
 typedef std::vector<PrizeKeyRow> PrizeKeyRows;
@@ -271,23 +271,23 @@ int GetPrizeId(const Key& prizeKey, const Key& betKey)
 
 struct PrizedPlayer
 {
-	PrizedPlayer()
-	{
-		Reward = 0;
-	}
-	
-	Player* Player; // the player
-	std::vector< std::pair<int, double> > Prizes; // prize and number of times it won
-	KeyList Keys; // prized keys
-	int TotalBetsCount; // number of bets (prized + non prized)
-	double Reward; // total money rewarded
-	
-	void IncreaseBalance(double amount, int prize)
-	{
-		Player->Balance += amount;
-		Reward += amount;
-		Prizes[prize].second = amount / Prizes[prize].first;
-	}
+    PrizedPlayer()
+    {
+        Reward = 0;
+    }
+    
+    Player* Player; // the player
+    std::vector< std::pair<int, double> > Prizes; // prize and number of times it won
+    KeyList Keys; // prized keys
+    int TotalBetsCount; // number of bets (prized + non prized)
+    double Reward; // total money rewarded
+    
+    void IncreaseBalance(double amount, int prize)
+    {
+        Player->Balance += amount;
+        Reward += amount;
+        Prizes[prize].second = amount / Prizes[prize].first;
+    }
 };
 
 typedef std::vector<PrizedPlayer> PrizedPlayers;
@@ -323,16 +323,16 @@ PrizedPlayers CalculatePrizedPlayers(const PlayerBetsList& bets, const Key& priz
         }
         // index now contains the index of the player that will be rewarded
 
-		prizedPlayer.TotalBetsCount = bets[i].second.size();
+        prizedPlayer.TotalBetsCount = bets[i].second.size();
 
         for (int j = 0; j < prizedPlayer.TotalBetsCount; ++j)
         {
             int prize = GetPrizeId(bets[i].second[j], prizeKey);
             if (prize != -1)
-			{
+            {
                 prizes[index].Prizes[prize].first = prizes[index].Prizes[prize].first + 1;
-				prizes[index].Keys.push_back(bets[i].second[j]);
-			}
+                prizes[index].Keys.push_back(bets[i].second[j]);
+            }
         }
     }
 
@@ -374,17 +374,17 @@ PrizeKeyRows CalculatePrizes(const PlayerBetsList& bets, int totalBets, const Ke
 
     const double awardPerPrize = (double)totalBets / countPrizedPrizes;
 
-	PrizeKeyRows prizeKeyRows;
+    PrizeKeyRows prizeKeyRows;
 
     for (size_t i = 0; i < PRIZES_MAX; ++i)
     {
-		PrizeKeyRow row;
+        PrizeKeyRow row;
 
-		row.PrizeId = i+1; // The prize id starting at 1
-		row.WinnerCount = existingPrizes[i]; // number of winners
-		row.Value = row.WinnerCount != 0 ? awardPerPrize / existingPrizes[i] : 0; // money to award to a person that won this prize (i)
-		row.Hits = GetHitForPrize(row.PrizeId);
-		prizeKeyRows.push_back(row);
+        row.PrizeId = i+1; // The prize id starting at 1
+        row.WinnerCount = existingPrizes[i]; // number of winners
+        row.Value = row.WinnerCount != 0 ? awardPerPrize / existingPrizes[i] : 0; // money to award to a person that won this prize (i)
+        row.Hits = GetHitForPrize(row.PrizeId);
+        prizeKeyRows.push_back(row);
 
         if (existingPrizes[i] == 0)
             continue;
@@ -393,141 +393,141 @@ PrizeKeyRows CalculatePrizes(const PlayerBetsList& bets, int totalBets, const Ke
             prizes[j].IncreaseBalance(prizes[j].Prizes[i].first * row.Value, i);
     }
 
-	return prizeKeyRows;
+    return prizeKeyRows;
 }
 
 void WritePrizeKey(const PrizeKeyRows& rows)
 {
-	std::ofstream file(PRIZE_KEY_FILE_NAME, std::ios::app | std::ios::out);
-	if (!file.is_open())
-	{
-		std::cout << "Ficheiro " << PRIZE_KEY_FILE_NAME << " nao encontrado." << std::endl;
-		exit(EXIT_FAILURE);
-	}
+    std::ofstream file(PRIZE_KEY_FILE_NAME, std::ios::app | std::ios::out);
+    if (!file.is_open())
+    {
+        std::cout << "Ficheiro " << PRIZE_KEY_FILE_NAME << " nao encontrado." << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
-	file << "Premio Acertos Num.Venc.      Valor     " << std::endl;
-	file << "------ ------- --------- ---------------" << std::endl;
+    file << "Premio Acertos Num.Venc.      Valor     " << std::endl;
+    file << "------ ------- --------- ---------------" << std::endl;
 
-	for (size_t i = 0; i < rows.size(); ++i)
-	{
-		file << "  " << std::setw(2) << rows[i].PrizeId << "   ";
-		file << "  " << std::setw(7) << rows[i].Hits << "   ";
-		file << std::setw(9) << rows[i].WinnerCount << " ";
-		file << std::setw(15) << std::setprecision(2) <<
-			std::setiosflags(std::ios::fixed) <<
-			rows[i].Value << std::endl;
-	}
+    for (size_t i = 0; i < rows.size(); ++i)
+    {
+        file << "  " << std::setw(2) << rows[i].PrizeId << "   ";
+        file << "  " << std::setw(7) << rows[i].Hits << "   ";
+        file << std::setw(9) << rows[i].WinnerCount << " ";
+        file << std::setw(15) << std::setprecision(2) <<
+            std::setiosflags(std::ios::fixed) <<
+            rows[i].Value << std::endl;
+    }
 
-	file.close();
+    file.close();
 }
 
 std::string WriteKeyForWinners(const Key& key, const Key& prizeKey, const std::vector< std::pair<int, double> >* prizes)
 {
-	std::stringstream ss;
+    std::stringstream ss;
 
-	int numbers = 0;
-	int stars = 0;
-	bool prize = false;
+    int numbers = 0;
+    int stars = 0;
+    bool prize = false;
 
-	// Write number part of keys
-	for (int i = 0; i < NUMBER_COUNT; ++i)
-	{
-		ss << std::setw(2) << key.first[i];
-		for (int j = 0; j < NUMBER_COUNT; ++j)
-		{
-			if (key.first[i] == prizeKey.first[j])
-			{
-				ss << "*";
-				numbers++;
-				prize = true;
-			}
-		}
+    // Write number part of keys
+    for (int i = 0; i < NUMBER_COUNT; ++i)
+    {
+        ss << std::setw(2) << key.first[i];
+        for (int j = 0; j < NUMBER_COUNT; ++j)
+        {
+            if (key.first[i] == prizeKey.first[j])
+            {
+                ss << "*";
+                numbers++;
+                prize = true;
+            }
+        }
 
-		if (prize)
-			prize = false;
-		else
-			ss << " ";
+        if (prize)
+            prize = false;
+        else
+            ss << " ";
 
-		ss << " ";
-	}
+        ss << " ";
+    }
 
-	// Write star part of keys
-	for (int i = 0; i < STAR_COUNT; ++i)
-	{
-		ss << std::setw(2) << key.second[i];
-		for (int j = 0; j < STAR_COUNT; ++j)
-		{
-			if (key.second[i] == prizeKey.second[j])
-			{
-				ss << "*";
-				stars++;
-				prize = true;
-			}
-		}
+    // Write star part of keys
+    for (int i = 0; i < STAR_COUNT; ++i)
+    {
+        ss << std::setw(2) << key.second[i];
+        for (int j = 0; j < STAR_COUNT; ++j)
+        {
+            if (key.second[i] == prizeKey.second[j])
+            {
+                ss << "*";
+                stars++;
+                prize = true;
+            }
+        }
 
-		if (prize)
-			prize = false;
-		else
-			ss << " ";
+        if (prize)
+            prize = false;
+        else
+            ss << " ";
 
-		ss << " ";
-	}
+        ss << " ";
+    }
 
-	ss << "   ";
+    ss << "   ";
 
-	int prizeId = GetPrizeForHit(numbers, stars);
+    int prizeId = GetPrizeForHit(numbers, stars);
 
-	// Write prize in "hit" form
-	ss << "(" << GetHitForPrize(prizeId) << ")=";
+    // Write prize in "hit" form
+    ss << "(" << GetHitForPrize(prizeId) << ")=";
 
-	// Write awarded money for this key
-	ss << std::setprecision(2) << std::fixed << prizes->at(prizeId).second;
+    // Write awarded money for this key
+    ss << std::setprecision(2) << std::fixed << prizes->at(prizeId).second;
 
-	return ss.str();
+    return ss.str();
 }
 
 void WriteWinners(const PrizedPlayers& prizes, const Key& prizeKey)
 {
-	std::ofstream file(WINNERS_FILE_NAME);
-	if (!file.is_open())
-	{
-		std::cout << "Ficheiro " << WINNERS_FILE_NAME << " nao aberto." << std::endl;
-		exit(EXIT_FAILURE);
-	}
+    std::ofstream file(WINNERS_FILE_NAME);
+    if (!file.is_open())
+    {
+        std::cout << "Ficheiro " << WINNERS_FILE_NAME << " nao aberto." << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
-	for (std::vector<PrizedPlayer>::const_iterator plr = prizes.begin(); plr != prizes.end(); ++plr)
-	{
-		// write id
-		file << std::setfill(ID_FILL_CHAR) << std::setw(ID_WIDTH-1) << plr->Player->Id;
-		file << std::setfill(' ') << " - ";
+    for (std::vector<PrizedPlayer>::const_iterator plr = prizes.begin(); plr != prizes.end(); ++plr)
+    {
+        // write id
+        file << std::setfill(ID_FILL_CHAR) << std::setw(ID_WIDTH-1) << plr->Player->Id;
+        file << std::setfill(' ') << " - ";
 
-		// write name
-		file << std::left << std::setw(NAME_WIDTH-1) << plr->Player->Name << std::right;
-		file << " - ";
+        // write name
+        file << std::left << std::setw(NAME_WIDTH-1) << plr->Player->Name << std::right;
+        file << " - ";
 
-		// write total bets / prized bets
-		file << std::setw(6) << plr->TotalBetsCount << "/" << plr->Keys.size();
-		file << " - ";
+        // write total bets / prized bets
+        file << std::setw(6) << plr->TotalBetsCount << "/" << plr->Keys.size();
+        file << " - ";
 
-		// write total reward
-		file << std::setprecision(2) << std::fixed << plr->Reward;
-		file << std::endl;
+        // write total reward
+        file << std::setprecision(2) << std::fixed << plr->Reward;
+        file << std::endl;
 
-		for (size_t i = 0; i < plr->Keys.size(); ++i)
-			file << WriteKeyForWinners(plr->Keys[i], prizeKey, &plr->Prizes) << std::endl;
-	}
+        for (size_t i = 0; i < plr->Keys.size(); ++i)
+            file << WriteKeyForWinners(plr->Keys[i], prizeKey, &plr->Prizes) << std::endl;
+    }
 }
 
 int main()
 {
     int totalBets;
 
-	 // Gets the key and the amount of money to award (from bets)
-	std::cout << "- Obtendo chave vencendora..." << std::endl;
+     // Gets the key and the amount of money to award (from bets)
+    std::cout << "- Obtendo chave vencendora..." << std::endl;
     Key prizeKey = GetPrizeKeyFromFile(totalBets);
 
-	// Get a list of players from players.txt
-	std::cout << "- A ler jogadores..." << std::endl;
+    // Get a list of players from players.txt
+    std::cout << "- A ler jogadores..." << std::endl;
     PlayerList players;
     if (!Read(players))
     {
@@ -535,29 +535,29 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-	// Get bets from bets.txt
-	std::cout << "- A ler apostas..." << std::endl;
+    // Get bets from bets.txt
+    std::cout << "- A ler apostas..." << std::endl;
     PlayerBetsList bets = GetBets(players);
 
-	// Calculate prizes for each prize/players based on the prize key
-	std::cout << "- A calcular premios..." << std::endl;
-	PrizedPlayers prizedPlayers;
+    // Calculate prizes for each prize/players based on the prize key
+    std::cout << "- A calcular premios..." << std::endl;
+    PrizedPlayers prizedPlayers;
     PrizeKeyRows prizeKeyRows = CalculatePrizes(bets, totalBets, prizeKey, prizedPlayers);
 
-	// Append to prize_key.txt the amount of money distributed/count/etc for each prize
-	std::cout << "- A escrever em prize_key..." << std::endl;
-	WritePrizeKey(prizeKeyRows);
+    // Append to prize_key.txt the amount of money distributed/count/etc for each prize
+    std::cout << "- A escrever em prize_key..." << std::endl;
+    WritePrizeKey(prizeKeyRows);
 
-	// Create winners.txt
-	std::cout << "- A criar ficheiro de winners..." << std::endl;
-	WriteWinners(prizedPlayers, prizeKey);
+    // Create winners.txt
+    std::cout << "- A criar ficheiro de winners..." << std::endl;
+    WriteWinners(prizedPlayers, prizeKey);
 
 
     // ...
 
-	// Re-write players.txt with updated balances
-	std::cout << "- A actualizar players" << std::endl;
-	Save(players);
+    // Re-write players.txt with updated balances
+    std::cout << "- A actualizar players" << std::endl;
+    Save(players);
 
     system("PAUSE");
     return EXIT_SUCCESS;
