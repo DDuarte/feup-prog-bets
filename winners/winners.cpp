@@ -260,11 +260,18 @@ int GetPrizeId(const Key& prizeKey, const Key& betKey)
 
 struct PrizedPlayer
 {
-    Player* Player;
-    std::vector<int> Prizes; // prize and number of times it won
-	KeyList Keys;
-
-	void IncreaseBalance(double amount) { Player->Balance += amount; }
+	PrizedPlayer()
+	{
+		Reward = 0;
+	}
+	
+	Player* Player; // the player
+	std::vector<int> Prizes; // prize and number of times it won
+	KeyList Keys; // prized keys
+	int TotalBetsCount; // number of bets (prized + non prized)
+	double Reward; // total money rewarded
+	
+	void IncreaseBalance(double amount) { Player->Balance += amount; Reward += amount; }
 };
 
 typedef std::vector<PrizedPlayer> PrizedPlayers;
@@ -300,7 +307,9 @@ PrizedPlayers CalculatePrizedPlayers(const PlayerBetsList& bets, const Key& priz
         }
         // index now contains the index of the player that will be rewarded
 
-        for (size_t j = 0; j < bets[i].second.size(); ++j)
+		prizedPlayer.TotalBetsCount = bets[i].second.size();
+
+        for (int j = 0; j < prizedPlayer.TotalBetsCount; ++j)
         {
             int prize = GetPrizeId(bets[i].second[j], prizeKey);
             if (prize != -1)
@@ -425,6 +434,29 @@ void WriteWinners(const PrizedPlayers& prizes)
 		std::cout << "Ficheiro " << WINNERS_FILE_NAME << " nao aberto." << std::endl;
 		exit(EXIT_FAILURE);
 	}
+
+	for (std::vector<PrizedPlayer>::const_iterator plr = prizes.begin(); plr != prizes.end(); ++plr)
+	{
+		// write id
+		file << std::setfill(ID_FILL_CHAR) << std::setw(ID_WIDTH-1) << plr->Player->Id;
+		file << std::setfill(' ') << " - ";
+
+		// write name
+		file << std::left << std::setw(NAME_WIDTH-1) << plr->Player->Name << std::right;
+		file << " - ";
+
+		// write total bets / prized bets
+		file << std::setw(6) << plr->TotalBetsCount << "/" << plr->Keys.size();
+		file << " - ";
+
+		// write total reward
+		file << std::setprecision(2) << std::setiosflags(std::ios::fixed) << plr->Reward;
+		file << std::endl;
+
+		// ...
+
+		file << std::endl;
+	}
 }
 
 int main()
@@ -432,9 +464,11 @@ int main()
     int totalBets;
 
 	 // Gets the key and the amount of money to award (from bets)
+	std::cout << "- Obtendo chave vencendora..." << std::endl;
     Key prizeKey = GetPrizeKeyFromFile(totalBets);
 
 	// Get a list of players from players.txt
+	std::cout << "- A ler jogadores..." << std::endl;
     PlayerList players;
     if (!Read(players))
     {
@@ -443,22 +477,27 @@ int main()
     }
 
 	// Get bets from bets.txt
+	std::cout << "- A ler apostas..." << std::endl;
     PlayerBetsList bets = GetBets(players);
 
 	// Calculate prizes for each prize/players based on the prize key
+	std::cout << "- A calcular premios..." << std::endl;
 	PrizedPlayers prizedPlayers;
     PrizeKeyRows prizeKeyRows = CalculatePrizes(bets, totalBets, prizeKey, prizedPlayers);
 
 	// Append to prize_key.txt the amount of money distributed/count/etc for each prize
+	std::cout << "- A escrever em prize_key..." << std::endl;
 	WritePrizeKey(prizeKeyRows);
 
 	// Create winners.txt
+	std::cout << "- A criar ficheiro de winners..." << std::endl;
 	WriteWinners(prizedPlayers);
 
 
     // ...
 
 	// Re-write players.txt with updated balances
+	std::cout << "- A actualizar players" << std::endl;
 	Save(players);
 
     system("PAUSE");
