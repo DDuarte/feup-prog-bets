@@ -7,25 +7,32 @@
 #include <typeinfo>
 #include <vector>
 #include <iostream>
+#include <cstdio>
 
-// random number between inf and sup (inclusive)
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+// Random number between inf and sup (inclusive)
 inline int Rand(int inf, int sup)
 {
     return rand() % (sup - inf + 1) + inf;
 }
 
-// converts char to upper, does nothing if char is uppercased already
+// Converts char to upper, does nothing if char is uppercased already
 inline char ToUpper(char c)
 {
     return ((c >= 'a' && c <= 'z') ? (c - 'a' - 'A') : c);
 }
 
+// Remove spaces at end and start of string
 void TrimSpaces(std::string& string)
 {
     string = string.erase(0, string.find_first_not_of(' '));
     string = string.erase(string.find_last_not_of(' ') + 1, string.size());
 }
 
+// Swaps two values
 template<typename T>
 void Swap(T& val1, T& val2)
 {
@@ -56,6 +63,8 @@ void Bubblesort(std::vector<T>& v)
     } while (n != 0);
 }
 
+// Read a value (any type) from console;
+// it will ask for the value again if it is not valid
 template <typename T>
 T ReadVal(std::string prompt)
 {
@@ -86,6 +95,8 @@ T ReadVal(std::string prompt)
     return val;
 }
 
+// Read a string from console (full line, including spaces)
+// it will truncate the string if input is bigger than count
 std::string ReadString(std::string prompt, size_t count = -1)
 {
     std::cout << prompt;
@@ -104,13 +115,37 @@ std::string ReadString(std::string prompt, size_t count = -1)
     return input;
 }
 
-// returns true if value exists in vector
+// Returns true if value exists in vector
 bool Exists(const std::vector<int>& vec, int val)
 {
     for (size_t i = 0; i < vec.size(); ++i)
         if (vec[i] == val)
             return true;
     return false;
+}
+
+void ClearScreen() // multi-platform, by "Cat Plus Plus"
+{
+#ifdef _WIN32 // Windows: Windows API
+	COORD topLeft  = { 0, 0 };
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO screen;
+	DWORD written;
+
+	GetConsoleScreenBufferInfo(console, &screen);
+	FillConsoleOutputCharacterA(console, ' ', screen.dwSize.X * screen.dwSize.Y, topLeft, &written);
+	FillConsoleOutputAttribute(console, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE, screen.dwSize.X * screen.dwSize.Y, topLeft, &written);
+	SetConsoleCursorPosition(console, topLeft);
+
+#else // UNIX: ANSI escape codes
+	std::cout << "\x1B[2J\x1B[H";
+#endif
+}
+
+void PauseScreen()
+{
+	std::cout << "Prima qualquer tecla para continuar..." << std::endl;
+	std::getchar();
 }
 
 #endif // UTILITIES_H_

@@ -159,7 +159,7 @@ int main()
             std::cout << "Por favor, carregue o seu cartao com pelo menos 1 euro." << std::endl;
         }
         else
-            std::cout << "Saldo actual: " << balance << " euros." << std::endl;
+            std::cout << "Saldo actual: " << std::fixed << std::setprecision(2) << balance << " euros." << std::endl;
 
         unsigned int manualBetsCount = 0;
         unsigned int autoBetsCount = 0;
@@ -215,5 +215,5 @@ int main()
         ModifyPrizeKeyFile(cost);
     }
         
-    system("PAUSE");
+    PauseScreen();
 }

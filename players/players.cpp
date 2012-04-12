@@ -103,7 +103,7 @@ int main()
                 int id = ReadVal<int>("Numero do jogador: ");
 
                 if (Player* player = SearchPlayerById(players, id))
-                    std::cout << "Saldo de " << player->Name << ": " << player->Balance << "E." << std::endl;
+                    std::cout << "Saldo de " << player->Name << ": " << std::fixed << std::setprecision(2) << player->Balance << "E." << std::endl;
                 else
                     std::cout << "Jogador " << id << " nao encontrado." << std::endl;
                 std::cout << std::endl;

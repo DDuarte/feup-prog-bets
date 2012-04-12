@@ -139,7 +139,7 @@ bool Read(PlayerList& players)
             return false;
         }
 
-        std::string name = nameCh;
+        std::string name(nameCh);
         TrimSpaces(name);
 
         RecreatePlayer(players, id, name, balance);
