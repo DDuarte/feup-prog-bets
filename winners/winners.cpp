@@ -5,6 +5,12 @@
 #include <iostream>
 #include <fstream>
 
+// A version of this file using pointers instead of copying
+// the keys from vectors to other vectors was done (it was intended
+// to reduce the amount of memory used and optimize performance)
+// but it turns out it did not improve anything and the code
+// just got more complex (reverted since it was not worth it)
+
 #define WINNERS_FILE_NAME "winners.txt"
 #define PRIZES_MAX 13
 
@@ -34,24 +40,6 @@ struct PrizedPlayer
 
 typedef std::vector<PrizedPlayer> PrizedPlayers;
 
-struct Match
-{
-    Match(int numberCount, int starCount)
-    {
-        NumberCount = numberCount;
-        StarCount = starCount;
-    }
-
-    Match()
-    {
-        NumberCount = 0;
-        StarCount = 0;
-    }
-
-    int NumberCount;
-    int StarCount;
-};
-
 struct PrizeKeyRow
 {
     int PrizeId;
@@ -71,10 +59,12 @@ Key GetPrizeKeyFromFile(int& totalBets)
         exit(EXIT_FAILURE);
     }
 
-    std::string m, t, d, a, c, dd, cc, se; // each word in 1st and 2nd lines
+    // line 1
+    file.ignore(INT_MAX, ':'); // skips line till :
+    file >> totalBets;
 
-    file >> m >> t >> d >> a >> totalBets; // line 1
-    file >> c >> dd >> cc; // line 2 till first number
+    // line 2
+    file.ignore(INT_MAX, ':'); // skips line till :
 
     std::vector<int> numbers; // line 2, numbers
     for (int i = 0; i < NUMBER_COUNT; ++i)
@@ -84,7 +74,7 @@ Key GetPrizeKeyFromFile(int& totalBets)
         numbers.push_back(n);
     }
 
-    file >> se; // line 2, number/star separator;
+    file.ignore(3); // line 2, number/star separator;
 
     std::vector<int> stars; // line 2, stars
     for (int i = 0; i < STAR_COUNT; ++i)
@@ -256,7 +246,7 @@ PlayerBetsList GetBets(const PlayerList& players)
     return betsList;
 }
 
-Match CalculateMatchingKeys(const Key& a, const Key& b)
+std::pair<int, int> CalculateMatchingKeys(const Key& a, const Key& b)
 {
     int numberCount = 0;
     int starCount = 0;
@@ -279,14 +269,13 @@ Match CalculateMatchingKeys(const Key& a, const Key& b)
         }
     }
 
-    Match match(numberCount, starCount);
-    return match;
+    return std::make_pair(numberCount, starCount);
 }
 
 int GetPrizeId(const Key& prizeKey, const Key& betKey)
 {
-    Match match = CalculateMatchingKeys(prizeKey, betKey);
-    return GetPrizeForHit(match.NumberCount, match.StarCount);
+    std::pair<int, int> match = CalculateMatchingKeys(prizeKey, betKey);
+    return GetPrizeForHit(match.first, match.second);
 }
 
 // Returns the index of the player. If it does not exist, returns -1.
@@ -418,7 +407,7 @@ void WritePrizeKey(const PrizeKeyRows& rows)
     file.close();
 }
 
-std::string WriteKeyForWinners(const Key& key, const Key& prizeKey, const std::vector< std::pair<int, double> >* prizes)
+std::string WriteKeyForWinners(const Key& key, const Key& prizeKey, const std::vector< std::pair<int, double> >& prizes)
 {
     std::stringstream ss;
 
@@ -479,7 +468,7 @@ std::string WriteKeyForWinners(const Key& key, const Key& prizeKey, const std::v
     ss << "(" << GetHitForPrize(prizeId) << ")=";
 
     // Write awarded money for this key
-    ss << std::setprecision(2) << std::fixed << prizes->at(prizeId).second;
+    ss << std::setprecision(2) << std::fixed << prizes.at(prizeId).second;
 
     return ss.str();
 }
@@ -511,8 +500,9 @@ void WriteWinners(const PrizedPlayers& prizes, const Key& prizeKey)
         file << std::setprecision(2) << std::fixed << plr->Reward;
         file << std::endl;
 
+        // write keys
         for (size_t i = 0; i < plr->Keys.size(); ++i)
-            file << WriteKeyForWinners(plr->Keys[i], prizeKey, &plr->Prizes) << std::endl;
+            file << WriteKeyForWinners(plr->Keys[i], prizeKey, plr->Prizes) << std::endl;
     }
 }
 

@@ -2,6 +2,13 @@
 #define BETS_H_
 
 #include "../utilities.h"
+/*
+- onde estao definidas as seguintes funcoes: 
+- readval(recebe como argumento uma string para mostrar e verifica se o valor lido do teclado e do tipo inserido) 
+- exists(verifica a existencia de um valor no vector)
+- bubblesort(ordena o vector,definido com template para poder ordenar quer sejam ints, doubles, floats ou outro tipo de valores)
+- trimspaces(elimina os espaços a mais das strings)
+*/
 
 #include <utility>
 #include <vector>
