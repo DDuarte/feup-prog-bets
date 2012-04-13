@@ -1,3 +1,7 @@
+// FEUP - MIEIC - Programação - 2011/2012
+// Duarte Duarte & João Nadais
+
+
 #include "../players/players.h"
 #include "../utilities.h"
 #include "bets.h"

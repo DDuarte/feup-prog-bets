@@ -1,3 +1,6 @@
+// FEUP - MIEIC - Programação - 2011/2012
+// Duarte Duarte & João Nadais
+
 #include "../utilities.h"
 #include "../players/players.h"
 #include "../bets/bets.h"
@@ -570,7 +573,7 @@ int main()
     Save(players);
 
 	// Good bye.
-	std::cout << "Fim." << std::endl;
+	std::cout << "Sucesso" << std::endl;
 
 	PauseScreen();
     return EXIT_SUCCESS;

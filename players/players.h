@@ -1,5 +1,14 @@
+// FEUP - MIEIC - Programação - 2011/2012
+// Duarte Duarte & João Nadais
+
 #ifndef PLAYERS_H_
 #define PLAYERS_H_
+
+// "Má prática": ter definição de funções em header files
+// tal foi feito porque as funções e structs aqui definidas
+// são partilhadas pelos vários projectos.
+// Dever-se-ia ter apenas declarações aqui e produzir
+// uma biblioteca (estática ou dinâmica) com as definições.
 
 #include "../utilities.h"
 
