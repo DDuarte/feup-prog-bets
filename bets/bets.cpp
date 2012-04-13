@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <direct.h>
 
-
+// criacao de vector atraves da insercao de valores pelo teclado
 std::vector<int> InitVectorWithUserInput(int size, int min, int max, char* name)
 {
     std::vector<int> vec;
@@ -23,8 +23,11 @@ std::vector<int> InitVectorWithUserInput(int size, int min, int max, char* name)
         int num = 0;
         do 
         {
-            num = ReadVal<int>(ss.str());
-        } while (num == 0 || num < min || num > max || Exists(vec, num));
+            num = ReadVal<int>(ss.str()); // ss é convertida em string para ser mostrada
+        } while (/*num == 0 ||*/ num < min || num > max || Exists(vec, num));
+        // condição de terminação:
+        // número tem de estar dentro dos nossos limites,
+        // nem poderá já existir no vector
 
         vec.push_back(num);
     }
@@ -41,9 +44,12 @@ Key ReadKey()
     if (stars[0] > stars[1]) // sort (only 2 values, redundant to use bubblesort)
         Swap(stars[0], stars[1]);
 
-    return std::make_pair(numbers, stars);
+    Key key = { numbers, stars };
+
+    return key;
 }
 
+// Gerar um numero n de chaves aleatorias 
 KeyList GenerateNKeys(int n)
 {
     srand((unsigned int)time(NULL)); // seeding random number generator
@@ -55,6 +61,7 @@ KeyList GenerateNKeys(int n)
     return keys;
 }
 
+// Função para gerar um numero n de chaves definido por n
 KeyList ReadNKeys(int n)
 {
     KeyList keys;
@@ -67,6 +74,7 @@ KeyList ReadNKeys(int n)
     return keys;
 }
 
+// actualiza o ficheiro bets com as apostas feitas (contidas em chaves) correspondentes a cada jogador (identificado pelo id)
 bool AppendToBetsFile(const KeyList& keys, int playerId)
 {
     std::ofstream file(BETS_FILE_NAME, std::ios::out | std::ios::app);
@@ -85,35 +93,28 @@ bool AppendToBetsFile(const KeyList& keys, int playerId)
     return true;
 }
 
+// actualiza o numero de apostas do ficheiro prize_key.txt
 bool ModifyPrizeKeyFile(double bet)
 {
-    // Read first line
+    // Le a primeira linha
     std::ifstream in(PRIZE_KEY_FILE_NAME);
     
-    std::string m, t, d, a;
-    double totalBets;
+    double totalBets = 0;
 
     if (in.is_open())
     {
-        in >> m >> t >> d >> a >> totalBets;
+        in.ignore(INT_MAX, ':'); // lê e ignora até ao caracter ':'
+        in >> totalBets;
         in.close();
     }
-    else // if file does not exist, write to a new one
-    {
-        m = "Montante";
-        t = "total";
-        d = "de";
-        a = "apostas:";
-        totalBets = 0;
-    }
 
-    // Increase total bet amount
+    // Aumenta o numero total de apostas
     totalBets += bet;
 
-    // (Re)Write first line
+    // (Re)Escreve a primeira linha
     std::ofstream out(PRIZE_KEY_FILE_NAME);
-    out << m << " " << t << " " << d << " " << a << " " << totalBets << std::endl;
-    out << in.rdbuf();
+    out << "Montante total de apostas: " << totalBets << std::endl;
+    out << in.rdbuf(); // Escreve o resto do ficheiro, se existir
     out.close();
 
     return true;
@@ -121,8 +122,6 @@ bool ModifyPrizeKeyFile(double bet)
 
 int main()
 {
-    std::cout << "*** Bets ***" << std::endl << std::endl;
-
     PlayerList players;
     if (!Read(players))
     {
@@ -136,27 +135,40 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    while (true)
-    {
-        std::cout << "******************" << std::endl;
-        int id = ReadVal<int>("Numero de jogador (introduza \"-1\" para sair): ");
+    // nota: não é possível cancelar uma aposta a meio (TODO?)
 
-        if (id == -1)
-            exit(EXIT_SUCCESS);
+    while (true) // acaba quando o jogador introduzir o numero 0 no id do jogador
+    {
+        std::cout << "*** Euromilhoes: Registo de Apostas ***" << std::endl << std::endl;
+
+        std::cout << "******************" << std::endl;
+        std::cout << "Introduza 0 no numero de jogador para sair." << std::endl;
+
+        int id = ReadVal<int>("Numero de jogador: ");
+        if (id <= 0)
+            break;
 
         Player* player = SearchPlayerById(players, id);
-        if (player == NULL)
+        if (player == NULL) // nao encontrou o jogador
         {
             std::cerr << "Jogador " << id << " nao encontrado." << std::endl;
+            PauseScreen();
+            ClearScreen();
             continue;
         }
+        // encontrou e devolveu o apontador
 
         std::cout << "Bem-vindo " << player->Name << "!" << std::endl;
+
+        //retira-se o saldo e o nome do jogador
         const double balance = player->Balance;
-        if (balance == 0)
+        if (balance < BET_COST) // verifica se tem saldo para pelo menos uma aposta
         {
-            std::cout << "Nao podera fazer qualquer apostas com 0 euros." << std::endl;
+            std::cout << "Nao podera fazer qualquer apostas com " << std::fixed << std::setprecision(2) << balance << " euros." << std::endl;
             std::cout << "Por favor, carregue o seu cartao com pelo menos 1 euro." << std::endl;
+            PauseScreen();
+            ClearScreen();
+            continue;
         }
         else
             std::cout << "Saldo actual: " << std::fixed << std::setprecision(2) << balance << " euros." << std::endl;
@@ -176,12 +188,16 @@ int main()
         {
             std::cout << "O saldo nao e suficiente para apostar." << std::endl;
             std::cout << "Por favor, carregue o seu cartao." << std::endl;
+            PauseScreen();
+            ClearScreen();
             continue;
         }
 
         KeyList manualBets = ReadNKeys(manualBetsCount);
         KeyList autoBets = GenerateNKeys(autoBetsCount);
         
+        // gera-se a seguir um vector conjunto de todas as chaves para ser mostrado
+        // juntou-se manualBets e autoBets a um única vector: bets
         KeyList bets;
         if (manualBetsCount > 0)
         {
@@ -194,7 +210,7 @@ int main()
             autoBets.clear();
         }
 
-        // print keys
+        // mostra todas as chaves
         std::cout << std::endl;
         for (size_t i = 0; i < bets.size(); ++i)
             WriteKey(bets[i], std::cout);
@@ -204,16 +220,27 @@ int main()
         if (!AppendToBetsFile(bets, player->Id))
         {
             std::cout << "Ocorreu um erro ao guardar o ficheiro bets.txt." << std::endl;
+            PauseScreen();
+            ClearScreen();
             continue;
         }
 
-        // decrement balance and save players.txt file
+        // actualiza saldo do jogador depois de jogar as apostas
         player->Balance -= cost;
         Save(players);
 
-        // change prize_key.txt
-        ModifyPrizeKeyFile(cost);
+        // altera prize_key.txt
+        if (!ModifyPrizeKeyFile(cost))
+        {
+            // ocorreu um erro
+            std::cout << "Erro ao escrever " << BETS_FILE_NAME << ". A terminar." << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        PauseScreen();
+        ClearScreen();
     }
         
     PauseScreen();
+    return EXIT_SUCCESS; // se tudo for bem escrito o programa acaba
 }

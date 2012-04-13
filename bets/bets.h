@@ -28,9 +28,19 @@
 
 #define BET_COST 1.0f
 
-typedef std::pair< std::vector<int>, std::vector<int> > Key; // 2 vectors, numbers and stars
+struct Key // estrutura básica para o programa
+{
+    std::vector<int> Numbers;
+    std::vector<int> Stars;
+
+    // Since size is constant (NUMBER_COUNT, STAR_COUNT), we could
+    // use arrays but vectors are way easier to use and "maintain"
+    // and they are as efficient as arrays
+};
+
 typedef std::vector<Key> KeyList; // a vector of keys
 
+// para gerar um vector com valores aleatorios entre min e max de tamanho size
 std::vector<int> InitVectorWithRands(int size, int min, int max)
 {
     std::vector<int> vec;
@@ -47,6 +57,7 @@ std::vector<int> InitVectorWithRands(int size, int min, int max)
     return vec;
 }
 
+// para gerar uma chave automaticamente usando InitVectorWithRands
 Key GenerateRandomKey()
 {
     std::vector<int> numbers = InitVectorWithRands(NUMBER_COUNT, NUMBER_MIN, NUMBER_MAX);
@@ -56,20 +67,23 @@ Key GenerateRandomKey()
     if (stars[0] > stars[1]) // sort (only 2 values, redundant to use bubblesort)
         Swap(stars[0], stars[1]);
 
-    return std::make_pair(numbers, stars);
+    Key key = { numbers, stars };
+
+    return key;
 }
 
+// usando uma stream generica de output inserida pode servir quer para insercao em ficheiros quer para a stream de output da consola
 void WriteKey(Key key, std::ostream& stream)
 {
-    for (size_t i = 0; i < key.first.size(); ++i)
-        stream << std::setfill(' ') << std::setw(2) << key.first[i] << " ";
+    for (size_t i = 0; i < key.Numbers.size(); ++i)
+        stream << std::setfill(' ') << std::setw(2) << key.Numbers[i] << " ";
 
     stream << "- ";
 
-    for (size_t i = 0; i < key.second.size(); ++i)
+    for (size_t i = 0; i < key.Stars.size(); ++i)
     {
-        stream << std::setfill(' ') << std::setw(2) << key.second[i];
-        if (i != key.second.size() - 1) // do not print a space in last position
+        stream << std::setfill(' ') << std::setw(2) << key.Stars[i];
+        if (i != key.Stars.size() - 1) // do not print a space in last position
             stream << " ";
     }
 

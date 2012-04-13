@@ -65,10 +65,10 @@ int main()
     if (!Read(players))
         Save(players); // creates an empty file
 
-    std::cout << "*** Players ***" << std::endl << std::endl;
-
     while (true)
     {
+        std::cout << "*** Euromilhoes - Gestao de Jogadores ***" << std::endl << std::endl;
+
         std::cout << "Introduza a letra respectiva:" << std::endl;
         std::cout << "R - Registar um jogador." << std::endl;
         std::cout << "C - Consultar o saldo de um jogador." << std::endl;
@@ -196,5 +196,10 @@ int main()
                 break;
             }
         }
+
+        PauseScreen();
+        ClearScreen();
     }
+
+    PauseScreen();
 }

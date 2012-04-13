@@ -92,7 +92,9 @@ Key GetPrizeKeyFromFile(int& totalBets)
 
     file.close();
 
-    return std::make_pair(numbers, stars);
+    Key key = { numbers, stars };
+
+    return key;
 }
 
 int GetPrizeForHit(int numbers, int stars)
@@ -155,11 +157,11 @@ std::string GetHitForPrize(int prize)
     }
 }
 
-Key GetKey(const std::string& key)
+Key GetKey(const std::string& keyStr)
 {
     std::stringstream ss;
 
-    ss << key;
+    ss << keyStr;
 
     std::vector<int> numbers(NUMBER_COUNT);
     for (size_t i = 0; i < numbers.size(); ++i) // line 2, numbers
@@ -186,7 +188,9 @@ Key GetKey(const std::string& key)
         exit(EXIT_FAILURE);
     }
 
-    return std::make_pair(numbers, stars);
+    Key key = { numbers, stars };
+
+    return key;
 }
 
 PlayerBetsList GetBets(const PlayerList& players)
@@ -255,7 +259,7 @@ std::pair<int, int> CalculateMatchingKeys(const Key& a, const Key& b)
     {
         for (int j = 0; j < NUMBER_COUNT; ++j)
         {
-            if (a.first[i] == b.first[j])
+            if (a.Numbers[i] == b.Numbers[j])
                 numberCount++;
         }
     }
@@ -264,7 +268,7 @@ std::pair<int, int> CalculateMatchingKeys(const Key& a, const Key& b)
     {
         for (int j = 0; j < STAR_COUNT; ++j)
         {
-            if (a.second[i] == b.second[j])
+            if (a.Stars[i] == b.Stars[j])
                 starCount++;
         }
     }
@@ -418,10 +422,10 @@ std::string WriteKeyForWinners(const Key& key, const Key& prizeKey, const std::v
     // Write number part of keys
     for (int i = 0; i < NUMBER_COUNT; ++i)
     {
-        ss << std::setw(2) << key.first[i];
+        ss << std::setw(2) << key.Numbers[i];
         for (int j = 0; j < NUMBER_COUNT; ++j)
         {
-            if (key.first[i] == prizeKey.first[j])
+            if (key.Numbers[i] == prizeKey.Numbers[j])
             {
                 ss << "*";
                 numbers++;
@@ -442,10 +446,10 @@ std::string WriteKeyForWinners(const Key& key, const Key& prizeKey, const std::v
     // Write star part of keys
     for (int i = 0; i < STAR_COUNT; ++i)
     {
-        ss << std::setw(2) << key.second[i];
+        ss << std::setw(2) << key.Stars[i];
         for (int j = 0; j < STAR_COUNT; ++j)
         {
-            if (key.second[i] == prizeKey.second[j])
+            if (key.Stars[i] == prizeKey.Stars[j])
             {
                 ss << "*";
                 stars++;
@@ -508,9 +512,10 @@ void WriteWinners(const PrizedPlayers& prizes, const Key& prizeKey)
 
 int main()
 {
-    int totalBets;
+    std::cout << "*** Euromilhoes: Calculo de Premios e Vencedores ***" << std::endl << std::endl;
 
-     // Gets the key and the amount of money to award (from bets)
+    // Gets the key and the amount of money to award (from bets)
+    int totalBets;
     std::cout << "1. Obtendo chave vencendora..." << std::endl;
     Key prizeKey = GetPrizeKeyFromFile(totalBets);
 
