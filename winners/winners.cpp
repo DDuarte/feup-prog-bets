@@ -50,13 +50,13 @@ struct PrizeKeyRow
 
 typedef std::vector<PrizeKeyRow> PrizeKeyRows;
 
-Key GetPrizeKeyFromFile(int& totalBets)
+Key GetPrizeKeyFromFile(int& totalBets, bool& success)
 {
     std::ifstream file(PRIZE_KEY_FILE_NAME, std::ios::in);
     if (!file.is_open())
     {
         std::cout << "Ficheiro " << PRIZE_KEY_FILE_NAME << " nao encontrado." << std::endl;
-        exit(EXIT_FAILURE);
+        success = false;
     }
 
     // line 1
@@ -65,6 +65,13 @@ Key GetPrizeKeyFromFile(int& totalBets)
 
     // line 2
     file.ignore(INT_MAX, ':'); // skips line till :
+
+    if (!file.good())
+    {
+        success = false;
+        Key key;
+        return key; // do not use this value, just a "dummy"
+    }
 
     std::vector<int> numbers; // line 2, numbers
     for (int i = 0; i < NUMBER_COUNT; ++i)
@@ -86,11 +93,14 @@ Key GetPrizeKeyFromFile(int& totalBets)
 
     if (numbers.size() == 0 || stars.size() == 0 || file.bad())
     {
-        std::cout << "Erro ao processar " << PRIZE_KEY_FILE_NAME << "." << std::endl;
-        exit(EXIT_FAILURE);
+        success = false;
+        Key key;
+        return key; // do not use this value, just a "dummy"
     }
 
     file.close();
+
+    success = true;
 
     Key key = { numbers, stars };
 
@@ -516,8 +526,17 @@ int main()
 
     // Gets the key and the amount of money to award (from bets)
     int totalBets;
+    bool success;
     std::cout << "1. Obtendo chave vencendora..." << std::endl;
-    Key prizeKey = GetPrizeKeyFromFile(totalBets);
+    Key prizeKey = GetPrizeKeyFromFile(totalBets, success);
+
+    if (!success)
+    {
+        std::cout << "Erro ao ler chave de " PRIZE_KEY_FILE_NAME << ". A sair..." << std::endl;
+        std::cout << "(Ja executou prize_key.exe?)" << std::endl;
+        PauseScreen();
+        return EXIT_FAILURE;
+    }
 
     // Get a list of players from players.txt
     std::cout << "2. A ler jogadores..." << std::endl;
@@ -525,7 +544,8 @@ int main()
     if (!Read(players))
     {
         std::cout << "Erro ao processar " << PLAYERS_FILE_NAME << "." << std::endl;
-        exit(EXIT_FAILURE);
+        PauseScreen();
+        return EXIT_FAILURE;
     }
 
     // Get bets from bets.txt
